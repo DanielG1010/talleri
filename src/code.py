@@ -10,8 +10,6 @@ from digitalio import DigitalInOut
 import machine
 from math import atan2, degrees
 import adafruit_mpu6050
-from adafruit_bus_device.i2c_device import I2CDevice
-import adafruit_character_lcd.character_lcd_i2c as character_lcd
 import adafruit_dht
 
 # Configuración de la radio RFM9x
@@ -35,27 +33,6 @@ adc = machine.ADC(machine.Pin(32))
 # Configuración del sensor MPU6050
 i2c = board.I2C()
 sensor = adafruit_mpu6050.MPU6050(i2c)
-
-# Configuración del sensor de calidad del aire
-buzzerPin = digitalio.DigitalInOut(board.D10)
-buzzerPin.direction = digitalio.Direction.OUTPUT
-
-greenLED = digitalio.DigitalInOut(board.D11)
-greenLED.direction = digitalio.Direction.OUTPUT
-
-redLED = digitalio.DigitalInOut(board.D12)
-redLED.direction = digitalio.Direction.OUTPUT
-
-sensorPin = analogio.AnalogIn(board.A5)
-
-# Configuración del LCD de caracteres
-lcd_columns = 16
-lcd_rows = 2
-i2c_lcd = board.I2C()
-lcd = character_lcd.Character_LCD_I2C(i2c_lcd, lcd_columns, lcd_rows)
-feather_address = 0x00  # Reemplaza esto con la dirección I2C de tu Feather
-feather_device = I2CDevice(i2c_lcd, feather_address)
-lcd.backlight = True
 
 # Configuración del sensor DHT22
 dht = adafruit_dht.DHT22(board.D2)
@@ -127,16 +104,9 @@ while True:
     except RuntimeError as e:
         print("La lectura del DHT22 falló: ", e.args)
 
-    # Actualiza el mensaje en el LCD
-    with feather_device:
-        data = bytearray(32)
-        feather_device.readinto(data)
-        message = data.decode('utf-8').strip('\x00')
-        lcd.message = message
-
     # Datos de ejemplo (sustituye con tus propios datos)
     data = "{'temperatura': 25.5, 'humedad': 60.0, 'presion': 1013.25, 'pulsos_por_minuto': " + str(
-        pulso_por_min) + ", 'air_quality': " + str(sensorValue) + "}"
+        pulso_por_min) + "}"
     print(data)
     rfm9x.send(bytes(data, "UTF-8"))
     
