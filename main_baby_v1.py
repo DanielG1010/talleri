@@ -8,11 +8,18 @@ import board
 from math import atan2, degrees
 import adafruit_mpu6050
 
+## Need to copy in the lib within the feather lib files
+from adafruit_bme280 
+
+
 
 ##### Giro init
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 sensor = adafruit_mpu6050.MPU6050(i2c)
+
+## bme init
+bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 
 # Giro functions
 def vector_2_degrees(x, y):
@@ -98,5 +105,4 @@ while True:
             # If you want the information for the giro can use get_inclination() function
             angle_xz, angle_yz = get_inclination(sensor)
             print("XZ angle = {:6.2f}deg   YZ angle = {:6.2f}deg".format(angle_xz, angle_yz))
-            
-        
+            print("\nTemperature: %0.1f C" % bme280.temperature)
